@@ -1,0 +1,103 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb,amsmath}
+\usepackage[all]{xy}
+\usepackage{url}
+\usepackage{color}
+\newcommand{\angstrom}{\textup{\AA}}
+\color{black}
+\usepackage[autostyle]{csquotes}
+\usepackage{tikz}
+\usetikzlibrary{bayesnet}
+\def\UrlBreaks{\do\/\do-}
+\usepackage{dcolumn}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usetikzlibrary{positioning,shapes,arrows}
+\newcolumntype{M}[1]{D{.}{.}{1.#1}}
+\usepackage{upquote} % Upright quotes for verbatim code
+\usepackage{fancyvrb} % verbatim replacement that allows latex
+\usepackage{float}
+\usepackage{wrapfig,lipsum,booktabs}
+\usepackage{graphicx} 
+\usepackage{animate}
+
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{listings}
+\makeatletter
+\def\BState{\State\hskip-\ALG@thistlm}
+\makeatother
+\usepackage{geometry}
+\geometry{
+	a4paper,
+ 	left=12mm,
+ 	right=12mm,
+ 	top=12mm,
+ 	bottom=15mm
+}
+
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+
+
+
+\begin{document}
+\title{Train a multi-inventory Word Sense Disambiguation system}
+\author{Michał Ostyk-Narbutt (1854051)\\Prof. Roberto Navigli \\ Natural Language Processing Homework 3}
+
+\maketitle
+
+
+\begin{center}
+\includegraphics[width=0.3\textwidth]{img/sapienza_logo.jpg}
+\end{center}
+\maketitle
+\tableofcontents
+\clearpage
+\section{Introduction}
+
+\section{Model and Approach}
+
+\subsection{Dataset and tools}
+
+\subsection{Parsing}
+
+
+\subsection{Training}
+
+
+\section{Results}
+
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=\columnwidth, angle = 0]{img/grid.pdf}
+%\end{center}
+%\caption{Grid search of the best hyperparamters based on Table \ref{wrap-tab:1}. Visualization of the Correlation score vs each parameter depending on several others.}
+%\label{img:grid}
+%\end{figure}
+ 
+\section{Discussion}
+
+\subsection{General}
+
+
+\section{Conclusion}
+
+\begin{thebibliography}{1}
+
+\bibitem{Eurosense} Claudio Delli Bovi, José Camacho Collados, Alessandro Raganato and Roberto Navigli.
+EuroSense: Automatic Harvesting of Multilingual Sense Annotations from Parallel Text. Proceedings of 55th annual meeting of the Association for Computational Linguistics (ACL 2017), pages 594–600, Vancouver, Canada, 30 July-4 August 2017. \url{http://lcl.uniroma1.it/eurosense/}
+
+\bibitem{sew} Alessandro Raganato, Claudio Delli Bovi and Roberto Navigli.
+Automatic Construction and Evaluation of a Large Semantically Enriched Wikipedia. Proceedings of 25th International Joint Conference on Artificial Intelligence (IJCAI-16), pages 2894–2900, New York City, New York, USA, 9-15 July 2016. \url{http://lcl.uniroma1.it/sew/}
+
+\bibitem{code} \url{https://gitlab.com/Ostyk/michal_ostyknarbutt_1854051_nlp19hw3}
+\end{thebibliography}
+
+\end{document}
