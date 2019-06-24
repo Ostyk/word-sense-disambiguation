@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<corpus lang="en" source="semcor">
+<wf lemma="when" pos="ADV">When</wf>
+<wf lemma="do" pos="VERB">did</wf>
+<wf lemma="you" pos="PRON">you</wf>
+<instance id="d000.s017.t000" lemma="last" pos="ADV">last</instance>
+<instance id="d000.s017.t001" lemma="compare" pos="VERB">compare</instance>
+<wf lemma="you" pos="PRON">your</wf>
+<instance id="d000.s017.t002" lemma="present" pos="ADJ">present</instance>
+<instance id="d000.s017.t003" lemma="premium" pos="NOUN">premium</instance>
+<instance id="d000.s017.t004" lemma="cost" pos="NOUN">costs</instance>
+</corpus>

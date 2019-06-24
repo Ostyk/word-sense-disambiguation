@@ -1,0 +1,17 @@
+id,Wordnet1,Wordnet2,lemma,text,BabelNet,WordNetDomain,LexNames
+"['d000.s000.t001', 'wn:02604760v', nan]",be,been,bn:00083181v,factotum,verb.stative
+"['d000.s000.t002', 'wn:00696189v', nan]",review,reviewed,bn:00092618v,factotum,verb.cognition
+"['d000.s000.t003', 'wn:05981230n', nan]",objective,objectives,bn:00002179n,factotum,noun.cognition
+"['d000.s000.t004', 'wn:13296899n', nan]",benefit,benefit,bn:00009904n,economy,noun.possession
+"['d000.s000.t005', 'wn:00584891n', nan]",service,service,bn:00070654n,factotum,noun.act
+"['d000.s000.t006', 'wn:05899087n', nan]",program,program,bn:00064646n,factotum,noun.cognition
+"['d000.s001.t000', 'wn:02423183v', nan]",permit,permitted,bn:00082536v,factotum,verb.social
+"['d000.s001.t001', 'wn:02626604v', nan]",become,become,bn:00083294v,factotum,verb.stative
+"['d000.s001.t002', 'wn:13272712n', nan]",giveaway,giveaway,bn:00040564n,economy,noun.possession
+"['d000.s001.t003', 'wn:05899087n', nan]",program,program,bn:00064646n,factotum,noun.cognition
+"['d000.s001.t005', 'wn:02630189v', nan]",have,has,bn:00088078v,factotum,verb.stative
+"['d000.s001.t006', 'wn:05980875n', nan]",goal,goal,bn:00030721n,factotum,noun.cognition
+"['d000.s001.t008', 'wn:10053808n', nan]",employee,employee,bn:00030618n,person,noun.person
+"['d000.s001.t009', 'wn:14374273n', nan]",morale,morale,bn:00055852n,psychology,noun.state
+"['d000.s001.t012', 'wn:05147940n', nan]",productivity,productivity,bn:00064598n,factotum,noun.attribute
+"['d000.s002.t000', 'wn:00786195n', nan]",effort,effort,bn:00007011n,factotum,noun.act

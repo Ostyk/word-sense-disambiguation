@@ -14,7 +14,8 @@ __pycache__/
 # IPython notebook checkpoints
 .ipynb_checkpoints
 
-
+# training data
+resources/training-data
 
 
 # OS generated files #
