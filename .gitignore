@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+parsed_corpora.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -16,7 +18,7 @@ __pycache__/
 
 # training data
 resources/training-data
-
+resources/WSD_Evaluation_Framework
 
 # OS generated files #
 ######################
