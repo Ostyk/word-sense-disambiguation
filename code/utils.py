@@ -2,7 +2,19 @@ from nltk.corpus import wordnet as wn
 import os
 import pandas as pd
 from tqdm import tqdm
+import json
 
+def json_vocab_reader(path):
+    """
+    Reads a json format vocabulary
+    :param path: vocabulary file path 
+    :return: vocab dict with special symbols
+    """
+    with open(path, 'r') as file:
+        vocab_dict = json.load(file)
+    return vocab_dict
+    
+    
 def sensekeyToSynsetConverter(sensekey: str):
     """
     Retrieves a WordNet synset from a sensekey using the nltk package'''
