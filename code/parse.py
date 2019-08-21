@@ -32,11 +32,12 @@ class TrainingParser(object):
                 yield to_generator
             sentence.clear()
 
-    def create_vocab(self, input_vocab_path, pos_vocab_path, subsampling_rate=1e-4, min_count=5):
+    def create_vocab(self, input_vocab_path, pos_vocab_path, left_out_vocab_path, subsampling_rate=1e-3, min_count=5):
         """
         Creates  two vocabularies: Input and POS
         :param input_vocab_path: path to save input_vocab
         :param pos_vocab_path:  path to save pos_vocab
+        :param left_out_vocab_path: path to save left out words
         :param subsampling_rate: subsampling rate of the vocab http://mccormickml.com/2017/01/11/word2vec-tutorial-part-2-negative-sampling/
         :param min_count: occurence of word
         :return: None, JSON dumps to given paths
@@ -49,6 +50,8 @@ class TrainingParser(object):
             count += 1
 
             for word in sentence:
+                words_total += 1
+
                 lemma = word.lemma
                 pos = word.pos
 
@@ -59,58 +62,42 @@ class TrainingParser(object):
                 elif pos == 'NUM': lemma = "<NUM>"
                 elif pos == 'SYM': lemma = "<SYM>"
 
-
-
                 input_vocab[lemma] =  input_vocab.get(lemma, 0) + 1
                 pos_vocab[pos] = pos_vocab.get(pos, 0) + 1
 
-                words_total += 1
-
-            if count % 10_000 == 0:
-                print("{} sentences parsed thus far, with {} tags".format(count, len(input_vocab)))
 
 
-
+        print("{} sentences parsed with {} words".format(count, len(input_vocab)))
 
         #sort input vocab
         input_vocab = dict(sorted(input_vocab.items(), key=lambda x: x[1], reverse=True))
-
         #Subsampling
-        #http://mccormickml.com/2017/01/11/word2vec-tutorial-part-2-negative-sampling/
         #filter it to not touch words that cannot be subsampled or by min_count
         input_vocab = {word: occurence for word, occurence in input_vocab.items()
                        if word in not_subsampled
                        or occurence >= min_count}
 
-        #probabilty_of_keeping_word = lambda occurence: 1.0 - np.sqrt(subsampling_rate / occurence * words_total)
-        def probabilty_of_keeping_word(occurence):
-            fraction = occurence/words_total
-            return ( np.sqrt( fraction / subsampling_rate ) + 1 ) * ( subsampling_rate / fraction )
-
         input_vocab_to_file = []
         left_out_vocab = set()
 
         for (word, occurence) in input_vocab.items():
-            if word in not_subsampled or random.uniform(0, 1) >= probabilty_of_keeping_word(occurence):
+
+            prob = utils.probabilty_of_keeping_word(occurence, words_total, subsampling_rate, type_='mikolov2013')
+            if word in not_subsampled or random.uniform(0, 1) >= prob:
                 input_vocab_to_file.append(word)
             else:
                 left_out_vocab.add(word)
 
-        #new_vocab = [ (word) for (word, occurence) in filtered_vocab.items() if word in untouchable or uniform(0, 1) >= prob(occurence)]
+        print("subsampled input vocab: {}\nPOS vocab:{}\nleft out vocab:{}".format(len(input_vocab_to_file),
+                                                                                   len(pos_vocab),
+                                                                                   len(left_out_vocab)))
+        with open(left_out_vocab_path, 'w') as f:
+            json.dump(list(left_out_vocab), f)
 
-        print("input vocab: {}\nPOS vocab:{}".format( len(input_vocab_to_file), len(pos_vocab) ) )
         with open(input_vocab_path, 'w') as f:
             json.dump(input_vocab_to_file, f)
 
+        pos_vocab = sorted(pos_vocab.items(), key=lambda k: k[1], reverse=True)
+        pos_vocab = [i[0] for i in pos_vocab]
         with open(pos_vocab_path, 'w') as f:
             json.dump(pos_vocab, f)
-
-
-
-if __name__ == '__main__':
-
-#     Training = TrainingParser('../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor+OMSTI/semcor+omsti.data.xml')
-
-#     Training.create_vocab(input_vocab_path = "../resources/extracted-data/semcor+omsti.input.vocab.json",
-#                           pos_vocab_path = "../resources/extracted-data/semcor+omsti.pos.vocab.json")
-    pass
