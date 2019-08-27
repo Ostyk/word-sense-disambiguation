@@ -101,3 +101,27 @@ class TrainingParser(object):
         pos_vocab = [i[0] for i in pos_vocab]
         with open(pos_vocab_path, 'w') as f:
             json.dump(pos_vocab, f)
+
+            
+
+class GoldParser(object):
+    """
+    Class to parse the gold.txt file
+    """
+    def __init__(self, file):
+        self.file = open(file, 'r')
+        self.records = namedtuple("Gold", "id_ senses")
+            
+    def parse(self):
+        """
+        Parses the archived gold text file
+        :return: sentence generator
+        """
+        
+        for line in self.file:
+            line = line.strip()
+            line = line.split(" ")            
+            item = self.records(id_ = line[0],
+                                senses = list(set(utils.sensekeyToSynsetConverter(i) for i in line[1:])))
+            
+            yield item
