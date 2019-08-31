@@ -4,7 +4,7 @@ import pandas as pd
 from tqdm import tqdm
 import json
 from numpy import sqrt
-
+import copy
 
 def json_vocab_reader(path, leftout_path=None):
     """
@@ -92,3 +92,78 @@ def parse_evaluation(gold_file, babelnet2wordnet, babelnet2wndomains, babelnet2l
 def listdir_fullpath(d):
     '''returns a list of items in a directory with their full path'''
     return [os.path.join(d, f) for f in os.listdir(d)]
+
+
+
+#############################################################################################################################
+#############################################################################################################################
+#####################################      TO REDO THESE FUCNTIONS BELOW                    #################################
+#############################################################################################################################
+#############################################################################################################################
+def vocab_merge(vocab1, vocab2):
+    """
+    Merges two vocabularies into the first one, keeping the reverse vocabulary consistent.
+    :param vocab1: First vocabulary (will contain the merged vocabulary), as Dict str -> int
+    :param rev_vocab1: First reverse vocabulary, as List of str
+    :param vocab2: Second vocabulary, as Dict str -> int
+    :return: (vocab1, rev_vocab1) updated to resemble the merged vocabulary
+    """
+
+    v1 = copy.deepcopy(vocab1)
+
+    for key2 in vocab2.keys():
+        if key2 not in v1:
+            v1[key2] = len(v1)
+
+    return v1
+
+def wn_id_from_synset(synset):
+    """
+    Builds the WordNet ID in the shape of wn:<offset><pos> for the given synset.
+    :param synset: Synset to get the ID from
+    :return: WordNet ID as described
+    """
+
+    offset = str(synset.offset())
+    offset = "0" * (8 - len(offset)) + offset  # append heading 0s to the offset
+    wn_id = "wn:%s%s" % (offset, synset.pos())
+
+    return wn_id
+
+
+def candidate_synsets(lemma, pos):
+    """
+    Retrieves the candidate synsets for the given lemma and pos combination.
+    :param lemma: Lemma to get the synsets of
+    :param pos: POS associated to the lemma
+    :return: Candidate synsets having the given lemma and POS, as List; the lemma itself in case there is no match in WordNet
+    """
+
+    pos_dictionary = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB}   # open classes only
+    if pos == "." or pos == "PUNCT":
+        return ["<PUNCT>"]
+    elif pos == "NUM":
+        return ["<NUM>"]
+    elif pos == "SYM":
+        return ["<SYM>"]
+    elif pos in pos_dictionary:
+        synsets = wn.synsets(lemma, pos=pos_dictionary[pos])
+    else:
+        synsets = wn.synsets(lemma)
+    #print(len(synsets))
+    if len(synsets) == 0:
+        return [lemma]
+    return [wn_id_from_synset(syn) for syn in synsets]
+
+def replacement_routine(element, entry, antivocab, output_vocab):
+    ret_word = None
+    if element in antivocab:
+        ret_word = output_vocab["<REPLACEMENT>"]
+
+    if entry.instance or ret_word is None:
+        if element in output_vocab:
+            ret_word = output_vocab[element]
+        elif ret_word is None:
+            ret_word = output_vocab["<UNK>"]
+
+    return ret_word
