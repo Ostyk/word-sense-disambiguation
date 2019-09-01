@@ -1,0 +1,103 @@
+def apply_padding(output, key, maxlen, value):
+    x = output[key]
+    print(x)
+    if key == 'candidates':
+        for candidate in x:
+            x[candidate] = candidate + [[1]] * (maxlen-len(candidate))
+        return x
+    else:
+        return keras.preprocessing.sequence.pad_sequences(x, truncating='pre', padding='post', maxlen=maxlen, value = value )
+
+
+def prepare_sentence_batch(batch_size, training_file_path, antivocab, output_vocab, gold_file_path = None):
+    """
+    Batch procesing generator, yields a dict of sentences, candidates and labels if in training mode (determined if gold_file_path is specified)
+    
+    param batch_size: 
+    param training_file_path: 
+    param antivocab: 
+    param output_vocab: 
+    param gold_file_path: 
+    return: generator object
+    """
+    batch = {"sentences" : [], "candidates" : []}
+    
+    training_data_flow = parsers.TrainingParser(training_file_path)
+    if gold_file_path:
+        gold_data_flow = parsers.GoldParser(gold_file_path)
+        batch.update({"labels" : []})
+        
+    
+    for batch_count, sentence in enumerate(training_data_flow.parse()):
+        #training mode
+        if gold_file_path:
+            labels = gold_data_flow.parse()         
+            output = prepare_sentence(sentence, antivocab, output_vocab, labels)
+            print(output)
+            for key in output.keys():
+                print(output[key])
+                print(key)
+                #print(apply_padding(output, key, maxlen = 50, value = 1))
+                q = apply_padding(output, key, maxlen = 50, value = 1)
+                print(q)
+                batch[key].append(q)
+
+        #evaulation mode
+        else:
+            output = prepare_sentence(sentence, antivocab, output_vocab)
+            
+            for key in output.keys():
+                output[key] = apply_padding(x = output[key], maxlen = 50, value = 1)
+                batch[key].append(output[key])
+            
+        if batch_count == batch_size-1:
+            batch_count = 0
+            yield batch
+            
+    del batch
+            
+        
+def prepare_sentence(sentence, antivocab, output_vocab, labels=None):
+    """
+    Prepares an output sentence consisting of the sentence itself along with labels and candidates
+    
+    param sentence: 
+    param antivocab: 
+    param output_vocab: 
+    param labels: 
+    
+    return output: dict with keys: sentence, labels, candidates all list type objects
+    """
+    records = namedtuple("Training", "id_ lemma pos instance")
+
+    output = {"sentence" : [], "labels" : [], "candidates": []}
+    for entry in sentence:
+        
+        id_, lemma, pos, _ = entry
+        
+        output_word = utils.replacement_routine(lemma, entry, antivocab, output_vocab)        
+        output['sentence'].append(output_word)
+        
+        if id_ is None:
+            output['labels'].append(output_word)
+            candidates = [output_word]
+            
+        else:
+            if labels is not None:
+                current_label = labels.__next__()
+                assert current_label.id_ == id_, "ID mismatch"
+                
+                sense = current_label.senses[0]
+                sense = output_vocab[sense] if sense in output_vocab else output_vocab["<UNK>"]
+                output['labels'].append(sense)
+            candidates = utils.candidate_synsets(lemma, pos)
+            candidates = [utils.replacement_routine(c, records(id_=None, lemma=c, pos="X", instance=True), antivocab, output_vocab) for c in candidates]
+            
+        output['candidates'].append(candidates)
+    return output
+
+batch = prepare_sentence_batch(batch_size = 100,
+                               training_file_path = '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.data.xml',
+                               gold_file_path =  '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.gold.key.txt',
+                               antivocab = antivocab,
+                               output_vocab = output_vocab)

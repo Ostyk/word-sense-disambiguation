@@ -16,6 +16,8 @@ class Basic(object):
     def __init__(self):
         pass
     
+    def 
+    
 class MultiTask(object):
     """
     Word Sense Disambiguiation performed via elaborated basic sequence tagging
