@@ -28,8 +28,6 @@ class Basic(object):
     """
     def __init__(self, test):
         self.test = test
-        
-    
     
     def build(self, vocab_size, embedding_size, hidden_size, PADDING_SIZE, LEARNING_RATE, INPUT_DROPOUT, LSTM_DROPOUT,RECURRENT_DROPOUT, N_EPOCHS):
         
@@ -104,7 +102,6 @@ class Basic(object):
 
 
         for batch_count, sentence in enumerate(training_data_flow.parse(), start = 1):
-
             #training mode
             if gold_file_path:
                 labels = gold_data_flow.parse()         

@@ -13,7 +13,14 @@ class TrainingParser(object):
     def __init__(self, xml_file):
         self.xml_file = xml_file
         self.records = namedtuple("Training", "id_ lemma pos instance")
-
+    
+    def count(self):
+        """
+        Parses only for the sake of counting the number of sentences
+        return sum: of the sentences in the xml file
+        """
+        return sum(1 for _ in etree.iterparse(self.xml_file, tag="sentence"))
+            
     def parse(self):
         """
         Parses the archived training XML file in Raganato's format
