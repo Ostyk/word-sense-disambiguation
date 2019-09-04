@@ -4,6 +4,7 @@ import tensorflow.keras as K
 from collections import namedtuple
 import numpy as np
 from sklearn.utils import shuffle
+from tensorflow.python.keras.utils import Sequence
 
 class Basic(object):
     """
@@ -18,11 +19,16 @@ class Basic(object):
         self.PADDING_SIZE =  PADDING_SIZE
         self.gold_file_path  =  gold_file_path
         self.length = 0
-        
+
     def __len__(self):
-        return parsers.TrainingParser(self.training_file_path).count()
+        return parsers.TrainingParser(self.training_file_path).count() // self.batch_size
+
 
     def __getitem__(self):
+        return self.one_batch(self.batch_size, self.training_file_path, self.antivocab, self.output_vocab, self.PADDING_SIZE, self.gold_file_path)
+
+    @staticmethod
+    def one_batch(batch_size, training_file_path, antivocab, output_vocab, PADDING_SIZE, gold_file_path):
         """
         Batch procesing generator, yields a dict of sentences, candidates and labels if in training mode (determined if gold_file_path is specified)
 
@@ -35,18 +41,18 @@ class Basic(object):
         """
         batch = {"sentences" : [], "candidates" : []}
 
-        training_data_flow = parsers.TrainingParser(self.training_file_path )
-        if self.gold_file_path:
-            self.gold_data_flow = parsers.GoldParser(self.gold_file_path)
+        training_data_flow = parsers.TrainingParser(training_file_path )
+        if gold_file_path:
+            gold_data_flow = parsers.GoldParser(gold_file_path)
             batch.update({"labels" : []})
 
 
         for batch_count, sentence in enumerate(training_data_flow.parse(), start = 1):
-            self.length += 1
+            #length += 1
             #training mode
-            if self.gold_file_path:
-                labels = self.gold_data_flow.parse()
-                output = self.prepare_sentence(sentence, self.antivocab, self.output_vocab, labels)
+            if gold_file_path:
+                labels = gold_data_flow.parse()
+                output = Basic.prepare_sentence(sentence, antivocab, output_vocab, labels)
 
                 batch['sentences'].append(output['sentence'])
                 batch['candidates'].append(output['candidates'])
@@ -54,36 +60,36 @@ class Basic(object):
 
             #evaulation mode
             else:
-                output = self.prepare_sentence(sentence, antivocab, output_vocab)
+                output = Basic.prepare_sentence(sentence, antivocab, output_vocab)
 
                 batch['sentences'].append(output['sentence'])
                 batch['candidates'].append(output['candidates'])
 
-            if int(batch_count)%int(self.batch_size)==0:
+            if int(batch_count)%int(batch_size)==0:
 
                 for key in batch.keys():
-                    batch[key] = self.apply_padding(batch, key, maxlen = self.PADDING_SIZE, value = 1)
-                
-                
+                    batch[key] = Basic.apply_padding(batch, key, maxlen = PADDING_SIZE, value = 1)
+
+
                 batch_count = 0
-                
-                if self.gold_file_path:
-                    yield batch['sentences'], np.expand_dims(batch['labels'], axis=-1)
+
+                if gold_file_path:
+                    x, y = batch['sentences'], np.expand_dims(batch['labels'], axis=-1)
+                    yield (x, y)
                 else:
                     yield batch['sentences']
                 batch = {"sentences" : [], "candidates" : []}
-                if self.gold_file_path:
+                if gold_file_path:
                     batch.update({"labels" : []})
-                    
+
         if batch_count>0:
-            print(batch_count)
             for key in batch.keys():
-                    batch[key] = self.apply_padding(batch, key, maxlen = self.PADDING_SIZE, value = 1)
+                    batch[key] = Basic.apply_padding(batch, key, maxlen = PADDING_SIZE, value = 1)
             batch_count = 0
-            
-            if self.gold_file_path:
+
+            if gold_file_path:
                 x, y = batch['sentences'], np.expand_dims(batch['labels'], axis=-1)
-                yield shuffle(x, y)
+                yield (x, y)
             else:
                 yield shuffle(batch['sentences'])
 
