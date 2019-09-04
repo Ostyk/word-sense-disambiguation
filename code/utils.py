@@ -21,9 +21,9 @@ def json_vocab_reader(path, leftout_path=None):
     vocab = {**vocab_start, **vocab}
 
     if leftout_path!=None:
-        with open(path, 'r') as file:
-            lefout = json.load(file)
-        return vocab, lefout
+        with open(leftout_path, 'r') as file:
+            leftout = json.load(file)
+        return vocab, leftout
 
     else:
         return vocab
@@ -140,12 +140,11 @@ def candidate_synsets(lemma, pos):
     """
 
     pos_dictionary = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB}   # open classes only
-    if pos == "." or pos == "PUNCT":
-        return ["<PUNCT>"]
-    elif pos == "NUM":
-        return ["<NUM>"]
-    elif pos == "SYM":
-        return ["<SYM>"]
+    
+    if pos in [".", "?", ","]: return  "<PUNCT>"
+    elif pos == 'NUM': return "<NUM>"
+    elif pos == 'SYM': return "<SYM>"
+        
     elif pos in pos_dictionary:
         synsets = wn.synsets(lemma, pos=pos_dictionary[pos])
     else:
@@ -155,15 +154,24 @@ def candidate_synsets(lemma, pos):
         return [lemma]
     return [wn_id_from_synset(syn) for syn in synsets]
 
-def replacement_routine(element, entry, antivocab, output_vocab):
+def replacement_routine(lemma, pos, antivocab, output_vocab, instance):
+    lemma, pos = OOV_handeler(lemma, pos)
     ret_word = None
-    if element in antivocab:
+    if lemma in antivocab:
         ret_word = output_vocab["<REPLACEMENT>"]
 
-    if entry.instance or ret_word is None:
-        if element in output_vocab:
-            ret_word = output_vocab[element]
+    if instance or ret_word is None:
+        if lemma in output_vocab:
+            ret_word = output_vocab[lemma]
         elif ret_word is None:
             ret_word = output_vocab["<UNK>"]
 
     return ret_word
+
+                    
+def OOV_handeler(lemma, pos):
+    if pos in [".", "?", ","]: lemma = "<PUNCT>"
+    elif pos == 'NUM': lemma = "<NUM>"
+    elif pos == 'SYM': lemma = "<SYM>"
+
+    return lemma, pos

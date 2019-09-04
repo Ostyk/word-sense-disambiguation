@@ -65,10 +65,9 @@ class TrainingParser(object):
                 if word.instance == True:
                     not_subsampled.add(lemma)
                 # handling OOV
-                if pos in [".", "PUNCT"]: lemma = "<PUNCT>"
-                elif pos == 'NUM': lemma = "<NUM>"
-                elif pos == 'SYM': lemma = "<SYM>"
+                
 
+                lemma, pos = utils.OOV_handeler(lemma, pos)
                 input_vocab[lemma] =  input_vocab.get(lemma, 0) + 1
                 pos_vocab[pos] = pos_vocab.get(pos, 0) + 1
 
