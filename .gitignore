@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 parsed_corpora.csv
-
+resources/logging/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -71,6 +71,9 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+
+
+resources/logging/models
 
 # Translations
 *.mo
