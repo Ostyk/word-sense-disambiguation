@@ -6,8 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
-parsed_corpora.csv
 resources/logging/
+resources/models/all_models/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

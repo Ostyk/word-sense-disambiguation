@@ -102,21 +102,21 @@ def parse_evaluation(gold_file, babelnet2wordnet, babelnet2wndomains, babelnet2l
 
     mapping = mapping.drop(['sensekey2'],axis=1)
 
-    BabelNet = pd.read_table(babelnet2wordnet, sep = '\t', names = ['BabelNet', 'WordNet'])
-    WordNetDomain = pd.read_table(babelnet2wndomains, sep = '\t', names = ['BabelNet', 'WordNetDomain'])
-    LexicographerNet = pd.read_table(babelnet2lexnames, sep = '\t', names = ['BabelNet', 'LexNames'])
+    BabelNet = pd.read_csv(babelnet2wordnet, sep = '\t', names = ['babelnet', 'WordNet'])
+    WordNetDomain = pd.read_csv(babelnet2wndomains, sep = '\t', names = ['babelnet', 'wordnet_domains'])
+    LexicographerNet = pd.read_csv(babelnet2lexnames, sep = '\t', names = ['babelnet', 'lexicographer'])
 
     df = mapping
 
     df = df.join(BabelNet.set_index('WordNet'), on='WordNet')
 
-    df = df.join(WordNetDomain.set_index('BabelNet'), on='BabelNet')
+    df = df.join(WordNetDomain.set_index('babelnet'), on='babelnet')
 
-    df = df.join(LexicographerNet.set_index('BabelNet'), on='BabelNet')
+    df = df.join(LexicographerNet.set_index('babelnet'), on='babelnet')
 
     print("NA is {:.1f}%".format((1-(df.dropna().shape[0] / df.shape[0]) )*100))
-    df.WordNetDomain.fillna("factotum", inplace=True)
-    df.LexNames.fillna("misc", inplace=True)
+    df.wordnet_domains.fillna("factotum", inplace=True)
+    df.lexicographer.fillna("misc", inplace=True)
     return df
 
 def listdir_fullpath(d):
