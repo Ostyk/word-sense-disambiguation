@@ -65,34 +65,26 @@ class TrainingParser(object):
                 if word.instance == True:
                     not_subsampled.add(lemma)
                 # handling OOV
-                
-
                 lemma, pos = utils.OOV_handeler(lemma, pos)
+                
                 input_vocab[lemma] =  input_vocab.get(lemma, 0) + 1
                 pos_vocab[pos] = pos_vocab.get(pos, 0) + 1
-
-
 
         print("{} sentences parsed with {} words".format(count, len(input_vocab)))
 
         #sort input vocab
         input_vocab = dict(sorted(input_vocab.items(), key=lambda x: x[1], reverse=True))
         #Subsampling
-        #filter it to not touch words that cannot be subsampled or by min_count
-        input_vocab = {word: occurence for word, occurence in input_vocab.items()
-                       if word in not_subsampled
-                       or occurence >= min_count}
-
         input_vocab_to_file = []
         left_out_vocab = set()
 
         for (word, occurence) in input_vocab.items():
-
-            prob = utils.probabilty_of_keeping_word(occurence, words_total, subsampling_rate, type_='mikolov2013')
-            if word in not_subsampled or random.uniform(0, 1) >= prob:
-                input_vocab_to_file.append(word)
-            else:
-                left_out_vocab.add(word)
+            if word in not_subsampled or occurence >= min_count:
+                prob = utils.probabilty_of_keeping_word(occurence, words_total, subsampling_rate, type_='mikolov2013')
+                if word in not_subsampled or random.uniform(0, 1) >= prob:
+                    input_vocab_to_file.append(word)
+                else:
+                    left_out_vocab.add(word)
 
         print("subsampled input vocab: {}\nPOS vocab:{}\nleft out vocab:{}".format(len(input_vocab_to_file),
                                                                                    len(pos_vocab),

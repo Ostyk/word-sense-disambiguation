@@ -1,7 +1,7 @@
 import re
 import os
 
-from tqdm import tqdm, tnrange, tqdm_notebook
+from tqdm import tqdm, tnrange
 import json
 import pandas as pd
 import os
@@ -17,20 +17,38 @@ import tensorflow.keras as K
 
 class MFS(object):
     """
-    Word Sense Disambiguiation performed via Most Frequent Sense tagging
+    WSD performed via Most Frequent Sense (MFS) which always returns the predominant sense of a lemma
     """
-    def __init__(self):
-        pass
-    
+
+    def retrieve_item(lemma):
+        """
+        Retreives the MFS of a lemma from the nltk package if exists else word
+        """
+        synsets = wn.synsets(str(lemma))
+
+        if len(synsets) == 0:
+            return lemma
+        else:
+            mfs = synsets[0]
+            return utils.WordNet.from_synset(mfs)
+
+    def predict(sentence):
+        """
+        param: sentence of lemmas
+        return sentence MFS
+        """
+        return [MFS.retrieve_item(lemma) for lemma in sentence]
+
+
 # class Basic(object):
 #     """
 #     Word Sense Disambiguiation performed via a basic sequence tagging
 #     """
 #     def __init__(self, test):
 #         self.test = test
-    
+
 #     def build(self, vocab_size, embedding_size, hidden_size, PADDING_SIZE, LEARNING_RATE, INPUT_DROPOUT, LSTM_DROPOUT,RECURRENT_DROPOUT, N_EPOCHS):
-        
+
 #         print("Creating KERAS model")
 #         inputs = K.layers.Input(shape=(PADDING_SIZE,))
 #         embeddings = K.layers.Embedding(vocab_size,
@@ -83,11 +101,31 @@ def Basic(vocab_size, embedding_size, hidden_size, PADDING_SIZE, LEARNING_RATE, 
                   metrics = ['acc'])
 
     return model
-    
-    
+
+
 class MultiTask(object):
     """
     Word Sense Disambiguiation performed via elaborated basic sequence tagging
     """
     def __init__(self):
         pass
+
+
+def save_model(model, model_name):
+    """
+    param: model
+    param: model_name
+    return None:
+    """
+    rel_path = '../resources/models'
+    if not os.path.exists(rel_path):
+        os.mkdir(rel_path)
+
+    weights = os.path.join(rel_path,'model_weights_'+model_name+'.h5')
+    model_name_save = os.path.join(rel_path,'model_'+model_name+'.h5')
+
+    print("saving weights to: {}".format(weights))
+    model.save_weights(weights) #saving weights for further analysis
+
+    print("saving model to: {}".format(model_name_save))
+    model.save(model_name_save)

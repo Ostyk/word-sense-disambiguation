@@ -5,6 +5,36 @@ from tqdm import tqdm
 import json
 from numpy import sqrt
 import copy
+import parsers
+
+def eval_parser(path, batch_size):
+
+    data_flow = parsers.TrainingParser(path)
+    sentence_batch = []
+    for batch_count, sentence in enumerate(data_flow.parse(), start = 1):
+        sentence_batch.append(sentence)
+
+        if int(batch_count)%int(batch_size)==0:
+            yield sentence_batch
+            sentence_batch = []
+            
+class WordNet(object):
+    """
+    Retrieves a WordNet using the nltk package
+    """
+    def from_sensekey(sensekey: str):
+        """
+        param senskey:
+        """
+        synset = wn.lemma_from_key(sensekey).synset()
+        return WordNet.from_synset(synset)
+
+    def from_synset(synset):
+        """
+        param synset: dtype :nltk.corpus.reader.wordnet.Synset
+        """
+        return "wn:" + str(synset.offset()).zfill(8) + synset.pos()
+
 
 def json_vocab_reader(path, leftout_path=None):
     """
@@ -117,20 +147,6 @@ def vocab_merge(vocab1, vocab2):
 
     return v1
 
-def wn_id_from_synset(synset):
-    """
-    Builds the WordNet ID in the shape of wn:<offset><pos> for the given synset.
-    :param synset: Synset to get the ID from
-    :return: WordNet ID as described
-    """
-
-    offset = str(synset.offset())
-    offset = "0" * (8 - len(offset)) + offset  # append heading 0s to the offset
-    wn_id = "wn:%s%s" % (offset, synset.pos())
-
-    return wn_id
-
-
 def candidate_synsets(lemma, pos):
     """
     Retrieves the candidate synsets for the given lemma and pos combination.
@@ -140,19 +156,19 @@ def candidate_synsets(lemma, pos):
     """
 
     pos_dictionary = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB}   # open classes only
-    
+
     if pos in [".", "?", ","]: return  "<PUNCT>"
     elif pos == 'NUM': return "<NUM>"
     elif pos == 'SYM': return "<SYM>"
-        
+
     elif pos in pos_dictionary:
         synsets = wn.synsets(lemma, pos=pos_dictionary[pos])
     else:
         synsets = wn.synsets(lemma)
-    #print(len(synsets))
+
     if len(synsets) == 0:
         return [lemma]
-    return [wn_id_from_synset(syn) for syn in synsets]
+    return [WordNet.from_synset(syn) for syn in synsets]
 
 def replacement_routine(lemma, pos, antivocab, output_vocab, instance):
     lemma, pos = OOV_handeler(lemma, pos)
@@ -168,7 +184,7 @@ def replacement_routine(lemma, pos, antivocab, output_vocab, instance):
 
     return ret_word
 
-                    
+
 def OOV_handeler(lemma, pos):
     if pos in [".", "?", ","]: lemma = "<PUNCT>"
     elif pos == 'NUM': lemma = "<NUM>"
