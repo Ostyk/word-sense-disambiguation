@@ -163,8 +163,8 @@ def main_predict(input_path, output_path, resources_path, prediction_type, batch
     # # Model loading #
     # #################
     model_path, model_weight_path = sorted([os.path.join(resources_path,
-                                            os.path.join('models/best_model', i)) for i in os.listdir(
-                                            os.path.join(resources_path, 'models/best_model'))])
+                                        os.path.join('models/best_model', i)) for i in os.listdir(
+                                        os.path.join(resources_path, 'models/best_model')) if i.startswith("model")])
     
     loaded_model = K.models.load_model(model_path)
     loaded_model.load_weights(model_weight_path)
