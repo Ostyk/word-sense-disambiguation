@@ -17,7 +17,7 @@ def eval_parser(path, batch_size):
         if int(batch_count)%int(batch_size)==0:
             yield sentence_batch
             sentence_batch = []
-            
+
 class WordNet(object):
     """
     Retrieves a WordNet using the nltk package
@@ -85,6 +85,19 @@ def sensekeyToSynsetConverter(sensekey: str):
     wordnet_id = "wn:" + str(synset.offset()).zfill(8) + synset.pos()
     return wordnet_id
 
+def merge_vocabulary(vocab1, vocab2):
+    """
+    Merges two vocabularies
+    :param vocab1:
+    :param vocab2:
+    :return: merged vocab
+    """
+
+    merged = copy.deepcopy(vocab1)
+    for key2 in vocab2.keys():
+        if key2 not in merged:
+            merged[key2] = len(merged)
+    return merged
 
 def parse_evaluation(gold_file, babelnet2wordnet, babelnet2wndomains, babelnet2lexnames):
     """
@@ -123,69 +136,51 @@ def listdir_fullpath(d):
     '''returns a list of items in a directory with their full path'''
     return [os.path.join(d, f) for f in os.listdir(d)]
 
-
-
-#############################################################################################################################
-#############################################################################################################################
-#####################################      TO REDO THESE FUCNTIONS BELOW                    #################################
-#############################################################################################################################
-#############################################################################################################################
-def vocab_merge(vocab1, vocab2):
+def map_word_from_dict(lemma, pos, antivocab, output_vocab, instance):
     """
-    Merges two vocabularies into the first one, keeping the reverse vocabulary consistent.
-    :param vocab1: First vocabulary (will contain the merged vocabulary), as Dict str -> int
-    :param rev_vocab1: First reverse vocabulary, as List of str
-    :param vocab2: Second vocabulary, as Dict str -> int
-    :return: (vocab1, rev_vocab1) updated to resemble the merged vocabulary
+    :param lemma:
+    :param pos:
+    :param antivocab:
+    :param output_vocab:
+    :param instance:
+    :return: replaced word
     """
+    lemma, pos = OOV_handeler(lemma, pos)
+    
+    mapped_word = None
+    if lemma in antivocab:
+        mapped_word = output_vocab["<REPLACEMENT>"]
 
-    v1 = copy.deepcopy(vocab1)
+    if instance or mapped_word is None:
+        if lemma in output_vocab:
+            mapped_word = output_vocab[lemma]
+        elif mapped_word is None:
+            mapped_word = output_vocab["<UNK>"]
 
-    for key2 in vocab2.keys():
-        if key2 not in v1:
-            v1[key2] = len(v1)
-
-    return v1
+    return mapped_word
 
 def candidate_synsets(lemma, pos):
     """
-    Retrieves the candidate synsets for the given lemma and pos combination.
-    :param lemma: Lemma to get the synsets of
-    :param pos: POS associated to the lemma
-    :return: Candidate synsets having the given lemma and POS, as List; the lemma itself in case there is no match in WordNet
+    Used to restrict our attention only to synsets from the entire probability distribution over the output layer
+    :param lemma:
+    :param pos: 
+    :return: list(Candidate synsets) or lemma if nothing in Wordnet
     """
-
-    pos_dictionary = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB}   # open classes only
-
-    if pos in [".", "?", ","]: return  "<PUNCT>"
-    elif pos == 'NUM': return "<NUM>"
-    elif pos == 'SYM': return "<SYM>"
-
-    elif pos in pos_dictionary:
-        synsets = wn.synsets(lemma, pos=pos_dictionary[pos])
-    else:
-        synsets = wn.synsets(lemma)
-
-    if len(synsets) == 0:
+    pos_dict = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB} 
+    
+    synsets = wn.synsets(lemma, pos=pos_dict[pos]) if pos in pos_dict else wn.synsets(lemma)
+    if len(synsets) == 0: 
         return [lemma]
-    return [WordNet.from_synset(syn) for syn in synsets]
-
-def replacement_routine(lemma, pos, antivocab, output_vocab, instance):
-    lemma, pos = OOV_handeler(lemma, pos)
-    ret_word = None
-    if lemma in antivocab:
-        ret_word = output_vocab["<REPLACEMENT>"]
-
-    if instance or ret_word is None:
-        if lemma in output_vocab:
-            ret_word = output_vocab[lemma]
-        elif ret_word is None:
-            ret_word = output_vocab["<UNK>"]
-
-    return ret_word
-
-
+    else:
+        return [WordNet.from_synset(x) for x in synsets]
+    
 def OOV_handeler(lemma, pos):
+    """
+    Handles OOV words
+    :param lemma: str
+    :param pos: str
+    :return: lemma, pos
+    """
     if pos in [".", "?", ","]: lemma = "<PUNCT>"
     elif pos == 'NUM': lemma = "<NUM>"
     elif pos == 'SYM': lemma = "<SYM>"

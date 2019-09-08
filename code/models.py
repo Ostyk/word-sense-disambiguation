@@ -105,7 +105,7 @@ def Basic(vocab_size, embedding_size, hidden_size, PADDING_SIZE, LEARNING_RATE, 
 
 class MultiTask(object):
     """
-    Word Sense Disambiguiation performed via elaborated basic sequence tagging
+    Word Sense Disambiguiation performed via elaborated methods
     """
     def __init__(self):
         pass

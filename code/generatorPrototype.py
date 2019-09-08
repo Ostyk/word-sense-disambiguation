@@ -115,7 +115,7 @@ def prepare_sentence(sentence, antivocab, output_vocab, labels=None):
 
             id_, lemma, pos, instance = entry
 
-            output_word = utils.replacement_routine(lemma, pos, antivocab, output_vocab, instance)
+            output_word = utils.map_word_from_dict(lemma, pos, antivocab, output_vocab, instance)
             output['sentence'].append(output_word)
 
             if id_ is None:
@@ -131,7 +131,7 @@ def prepare_sentence(sentence, antivocab, output_vocab, labels=None):
                     sense = output_vocab[sense] if sense in output_vocab else output_vocab["<UNK>"]
                     output['labels'].append(sense)
                 candidates = utils.candidate_synsets(lemma, pos)
-                candidates = [utils.replacement_routine(c, "X", antivocab, output_vocab, instance=True) for c in candidates]
+                candidates = [utils.map_word_from_dict(c, "X", antivocab, output_vocab, instance=True) for c in candidates]
 
             output['candidates'].append(candidates)
         return output

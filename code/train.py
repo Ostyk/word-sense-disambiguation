@@ -1,12 +1,18 @@
-#!/usr/bin/env python
-# coding: utf-8
+from tensorflow.random import set_random_seed
+set_random_seed(42)
+import tensorflow.keras as K
+import time
+import os
+import numpy as np
+import time
 
-# In[1]:
-
+import os
+import models
+import utils
+import generatorPrototype
 
 training_file_path = '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.data.xml'
 gold_file_path =  '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.gold.key.txt'
-
 training_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2013/semeval2013.data.xml'
 gold_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2013/semeval2013.gold.key.txt'
 fine_senses_vocab_path = '../resources/semcor.vocab.WordNet.json'
@@ -20,39 +26,14 @@ PADDING_SIZE = 50
 print_model = False
 
 
-# In[2]:
-
-
-import models
-import utils
-import generators
-import generatorsCopy
-
-from tensorflow.random import set_random_seed
-set_random_seed(42)
-import tensorflow.keras as K
-#import keras as K
-import time
-import os
-#from tqdm import tqdm
-import numpy as np
-import time
-import os
-
-
-# In[3]:
-
 
 #loading dict
 senses = utils.json_vocab_reader(fine_senses_vocab_path)
 inputs, antivocab = utils.json_vocab_reader(input_vocab_path, input_antivocab_path)
-output_vocab = utils.vocab_merge(senses, inputs)
+output_vocab = utils.merge_vocabulary(senses, inputs)
 reverse_output_vocab =  dict((v, k) for k, v in output_vocab.items())
 
 K.backend.clear_session()
-
-
-# In[11]:
 
 
 BasicModelNetwork = models.Basic(vocab_size = len(output_vocab),
@@ -69,25 +50,20 @@ if print_model is True:
     BasicModelNetwork.summary()
 
 
-# In[20]:
 
-
-train_generator = generatorsCopy.get(batch_size = 64,
+train_generator = generatorPrototype.get(batch_size = 64,
                                 training_file_path = training_file_path,
                                 gold_file_path = gold_file_path,
                                 antivocab = antivocab,
                                 output_vocab = output_vocab,
                                 PADDING_SIZE = PADDING_SIZE)
 
-validation_generator = generatorsCopy.get(batch_size = 64,
+validation_generator = generatorPrototype.get(batch_size = 64,
                                          training_file_path = training_file_path_dev,
                                          gold_file_path = gold_file_path_dev,
                                          antivocab = antivocab,
                                          output_vocab = output_vocab,
                                          PADDING_SIZE = PADDING_SIZE)
-
-
-# In[21]:
 
 
 if not os.path.exists('../resources/logging'):
@@ -108,20 +84,8 @@ model_checkpoint = K.callbacks.ModelCheckpoint(filepath = '../resources/logging/
                                                mode='auto', period=1)
 
 
-# In[22]:
-
-
-train_len = generatorsCopy.__len__(training_file_path, batch_size)
-val_len = generatorsCopy.__len__(training_file_path_dev, batch_size)
-
-
-# In[23]:
-
-
-train_len,val_len
-
-
-# In[ ]:
+train_len = generatorPrototype.__len__(training_file_path, batch_size)
+val_len = generatorPrototype.__len__(training_file_path_dev, batch_size)
 
 
 BasicModelNetwork.fit_generator(train_generator, 
@@ -137,9 +101,6 @@ BasicModelNetwork.fit_generator(train_generator,
                                 use_multiprocessing=False,
                                 shuffle=False,
                                 initial_epoch=0)
-
-
-# In[ ]:
 
 
 models.save_model(model = BasicModelNetwork, model_name = model_name)

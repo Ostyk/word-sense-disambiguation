@@ -156,7 +156,7 @@ def main_predict(input_path, output_path, resources_path, prediction_type, batch
     inputs, antivocab = utils.json_vocab_reader(os.path.join(resources_path, 'semcor.input.vocab.json'),
                                                 os.path.join(resources_path, 'semcor.leftout.vocab.json'))
     
-    output_vocab = utils.vocab_merge(senses, inputs)
+    output_vocab = utils.merge_vocabulary(senses, inputs)
     reverse_output_vocab =  dict((v, k) for k, v in output_vocab.items())
     
     # ##################
