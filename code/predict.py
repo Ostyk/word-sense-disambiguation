@@ -204,3 +204,50 @@ def main_predict(input_path, output_path, resources_path, prediction_type, batch
                 
                 out.write(fmt)
     print("done writing to:\t{}".format(output_path))
+    
+    
+def MFS_predict_writer(input_path, output_path, resources_path, prediction_type, batch_size=64):
+    """
+    :param input_path:
+    :param output_path:
+    :param resources_path:
+    :param batch_size: depends on the model
+    :param prediction_type: either babelnet, wordnet_domains, or lexicographer
+    :return: None
+    """
+    mapping = pd.read_csv(os.path.join(resources_path, "mapping.csv"))
+    real_words = eval_parser(path = input_path, batch_size = batch_size)
+    
+    def MFS_predict(batch_ground_truth_sentences):
+        """
+        Peforms MFS predictions on a batch for 
+        :param batch_ground_truth_sentences:
+        return predicted: batch of tuple(Sentence_id, WordNet)
+        """
+
+        outputs = []
+        output = namedtuple("output", "Sentence_id WordNet")
+
+        for idx_sentence, sentence in enumerate(batch_ground_truth_sentences):
+            for idx, entry in enumerate(sentence):
+                if entry.instance == True: #only for instances not wf
+                    word = entry.lemma
+                    item = output(Sentence_id = entry.id_, WordNet = models.MFS.retrieve_item(word))
+                    outputs.append(item)
+
+        return outputs
+    
+    with open(output_path, mode="a") as out:
+        for batch_ground_truth_sentences in tqdm(real_words, desc='batch: '):
+
+            batch_outputs = MFS_predict(batch_ground_truth_sentences)
+            
+            for line in batch_outputs:
+                #retreive appropriate mapping
+                pred = mapping[mapping.WordNet==line.WordNet][prediction_type].values
+                assert len(pred)==1, "error in mapping {}" .format(line.WordNet)
+                
+                fmt = "{} {} \n".format(line.Sentence_id, pred[0])
+                
+                out.write(fmt)
+    print("done writing to:\t{}".format(output_path))
