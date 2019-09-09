@@ -120,6 +120,6 @@ class GoldParser(object):
             line = line.strip()
             line = line.split(" ")            
             item = self.records(id_ = line[0],
-                                senses = list(set(utils.sensekeyToSynsetConverter(i) for i in line[1:])))
+                                senses = list(set(utils.WordNet.from_sensekey(i) for i in line[1:])))
             
             yield item

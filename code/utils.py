@@ -74,17 +74,6 @@ def probabilty_of_keeping_word(occurence, words_total, subsampling_rate, type_='
         return (sqrt(occurence/(subsampling_rate*words_total)) + 1) * (subsampling_rate * words_total / fraction)
 
 
-def sensekeyToSynsetConverter(sensekey: str):
-    """
-    Retrieves a WordNet synset from a sensekey using the nltk package'''
-    :param sensekey
-    :return: wordnet_id
-    """
-    synset = wn.lemma_from_key(sensekey).synset()
-
-    wordnet_id = "wn:" + str(synset.offset()).zfill(8) + synset.pos()
-    return wordnet_id
-
 def merge_vocabulary(vocab1, vocab2):
     """
     Merges two vocabularies
@@ -111,7 +100,7 @@ def parse_evaluation(gold_file, babelnet2wordnet, babelnet2wndomains, babelnet2l
 
     mapping = pd.read_table(gold_file, sep = ' ', names = ['sentence_idx', 'sensekey1', 'sensekey2'])
     tqdm.pandas(desc="Sensekey to Wordnet 1")
-    mapping['WordNet'] = mapping['sensekey1'].progress_apply(sensekeyToSynsetConverter)
+    mapping['WordNet'] = mapping['sensekey1'].progress_apply(utils.WordNet.from_sensekey)
 
     mapping = mapping.drop(['sensekey2'],axis=1)
 
