@@ -18,11 +18,11 @@ gold_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/
 fine_senses_vocab_path = '../resources/semcor.vocab.WordNet.json'
 input_vocab_path = '../resources/semcor.input.vocab.json'
 input_antivocab_path = '../resources/semcor.leftout.vocab.json'
-embedding_size = 32
+embedding_size = 64
 batch_size = 64
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.1
 N_EPOCHS = 10
-PADDING_SIZE = 50
+PADDING_SIZE = 30
 print_model = False
 
 
@@ -41,9 +41,9 @@ BasicModelNetwork = models.Basic(vocab_size = len(output_vocab),
                                 hidden_size = 32,
                                 PADDING_SIZE = PADDING_SIZE,
                                 LEARNING_RATE = LEARNING_RATE,
-                                INPUT_DROPOUT = 0.2,
+                                INPUT_DROPOUT = 0.25,
                                 LSTM_DROPOUT = 0.45,
-                                RECURRENT_DROPOUT = 0.35,
+                                RECURRENT_DROPOUT = 0.30,
                                 N_EPOCHS = N_EPOCHS)
 
 if print_model is True:
@@ -98,7 +98,7 @@ BasicModelNetwork.fit_generator(train_generator,
                                 class_weight=None,
                                 max_queue_size=10,
                                 workers=-1, 
-                                use_multiprocessing=False,
+                                use_multiprocessing=True,
                                 shuffle=False,
                                 initial_epoch=0)
 
