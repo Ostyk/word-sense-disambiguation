@@ -135,7 +135,7 @@ def basic_predict(batch_ground_truth_sentences, batch_model_predictions,
                 
     return outputs
 
-def main_predict(input_path, output_path, resources_path, prediction_type, batch_size=64, PADDING_SIZE=50):
+def main_predict(input_path, output_path, resources_path, prediction_type, batch_size=64, PADDING_SIZE=30):
     """
     :param input_path:
     :param output_path:
@@ -165,6 +165,9 @@ def main_predict(input_path, output_path, resources_path, prediction_type, batch
     model_path, model_weight_path = sorted([os.path.join(resources_path,
                                         os.path.join('models/best_model', i)) for i in os.listdir(
                                         os.path.join(resources_path, 'models/best_model')) if i.startswith("model")])
+    
+    model_path = os.path.join(resources_path, 'models/model_2019-09-09_21:26:42_+0000.h5')
+    model_weight_path = os.path.join(resources_path, 'models/model_weights_2019-09-09_21:26:42_+0000.h5')
     
     loaded_model = K.models.load_model(model_path)
     loaded_model.load_weights(model_weight_path)
