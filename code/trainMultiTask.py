@@ -14,9 +14,6 @@ import generatorMultitask
 training_file_path = '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.data.xml'
 gold_file_path =  '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.gold.key.txt'
 
-training_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2013/semeval2013.data.xml'
-gold_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2013/semeval2013.gold.key.txt'
-
 fine_senses_vocab_path = '../resources/semcor.vocab.WordNet.json'
 wordnet_domains_vocab_path = '../resources/semcor.vocab.WordNetDomain.json'
 lexicographer_vocab_path = '../resources/semcor.vocab.LexNames.json'
