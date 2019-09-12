@@ -29,7 +29,7 @@ def get(batch_size, resources_path, training_file_path, \
     """
 
     while True:
-        batch = {"sentences" : [], "candidates" : []}
+        batch = {"sentences" : [], "candidates" : [], "candidates_wndomain": [],  "candidates_lex": []}
 
         training_data_flow = parsers.TrainingParser(training_file_path )
         if gold_file_path:
@@ -47,7 +47,11 @@ def get(batch_size, resources_path, training_file_path, \
                 labels = gold_data_flow.parse()
                 output = prepare_sentence(sentence, antivocab, output_vocab, output_vocab2, output_vocab3, mapping_file, labels)
                 batch['sentences'].append(output['sentence'])
-                batch['candidates'].append(output['candidates'])
+
+                #batch['candidates'].append(output['candidates'])
+                #batch['candidates_wndomain'].append(output['candidates_wndomain'])
+                #batch['candidates_lex'].append(output['candidates_lex'])
+
                 batch['labels'].append(output['labels'])
                 batch['wndomain_labels'].append(output['wndomain_labels'])
                 batch['lex_labels'].append(output['lex_labels'])
@@ -58,6 +62,8 @@ def get(batch_size, resources_path, training_file_path, \
 
                 batch['sentences'].append(output['sentence'])
                 batch['candidates'].append(output['candidates'])
+                batch['candidates_wndomain'].append(output['candidates_wndomain'])
+                batch['candidates_lex'].append(output['candidates_lex'])
 
             if int(batch_count)%int(batch_size)==0:
 
@@ -74,9 +80,9 @@ def get(batch_size, resources_path, training_file_path, \
                     #x, y = shuffle(x, y)
                     yield x, y
                 else:
-                    yield batch['sentences'], batch['candidates']
+                    yield batch['sentences'], batch['candidates'], batch['candidates_wndomain'], batch['candidates_lex']
 
-                batch = {"sentences" : [], "candidates" : []}
+                batch = {"sentences" : [], "candidates" : [], "candidates_wndomain": [],  "candidates_lex": []}
                 if gold_file_path:
                     batch.update({"labels" : []})
                     batch.update({"wndomain_labels" : []})
@@ -96,7 +102,7 @@ def get(batch_size, resources_path, training_file_path, \
                 yield x, y
 
             else:
-                yield batch['sentences'], batch['candidates']
+                yield batch['sentences'], batch['candidates'], batch['candidates_wndomain'], batch['candidates_lex']
 
 def apply_padding(output, key, maxlen=50, value=1):
     """
@@ -133,7 +139,7 @@ def prepare_sentence(sentence, antivocab, output_vocab, output_vocab2=None, outp
         """
         records = namedtuple("Training", "id_ lemma pos instance")
 
-        output = {"sentence" : [], "labels" : [], "wndomain_labels" : [], "lex_labels" : [], "candidates": []}
+        output = {"sentence" : [], "labels" : [], "wndomain_labels" : [], "lex_labels" : [], "candidates": [],  "candidates_wndomain": [],  "candidates_lex": []}
         for entry in sentence:
 
             id_, lemma, pos, instance = entry
@@ -171,7 +177,11 @@ def prepare_sentence(sentence, antivocab, output_vocab, output_vocab2=None, outp
 
                 candidates = utils.candidate_synsets(lemma, pos)
                 candidates = [utils.map_word_from_dict(c, "X", antivocab, output_vocab, instance=True) for c in candidates]
+                candidates2 = [utils.map_word_from_dict(c, "X", antivocab, output_vocab2, instance=True) for c in candidates]
+                candidates3 = [utils.map_word_from_dict(c, "X", antivocab, output_vocab3, instance=True) for c in candidates]
 
             output['candidates'].append(candidates)
+            output['candidates_wndomain'].append(candidates)
+            output['candidates_lex'].append(candidates)
 
         return output

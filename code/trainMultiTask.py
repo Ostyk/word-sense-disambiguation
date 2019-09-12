@@ -62,8 +62,8 @@ MultiTaskModelNetwork = models.Multitask(vocab_size = vocab_sizes,
 
 if print_model is True:
     MultiTaskModelNetwork.summary()
-    
-    
+
+
 train_generator = generatorMultitask.get(batch_size = 64,
                                 resources_path = '../resources',
                                 training_file_path = training_file_path,
@@ -106,16 +106,16 @@ train_len = generatorMultitask.__len__(training_file_path, batch_size)
 val_len = generatorMultitask.__len__(training_file_path_dev, batch_size)
 
 
-MultiTaskModelNetwork.fit_generator(train_generator, 
+MultiTaskModelNetwork.fit_generator(train_generator,
                                 steps_per_epoch=train_len,
-                                epochs=N_EPOCHS, 
+                                epochs=N_EPOCHS,
                                 verbose=1,
                                 callbacks=[cbk, early_stopping],
                                 validation_data=validation_generator,
                                 validation_steps=val_len,
                                 class_weight=None,
                                 max_queue_size=10,
-                                workers=-1, 
+                                workers=-1,
                                 use_multiprocessing=True,
                                 shuffle=False,
                                 initial_epoch=0)
