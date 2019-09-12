@@ -297,12 +297,14 @@ def main_predict_multitask(input_path, output_path, resources_path, prediction_t
     # ##################
     # # Model loading #
     # #################
-    model_path, model_weight_path = sorted([os.path.join(resources_path,
-                                        os.path.join('models/best_model', i)) for i in os.listdir(
-                                        os.path.join(resources_path, 'models/best_model')) if i.startswith("model")])
+#     model_path, model_weight_path = sorted([os.path.join(resources_path,
+#                                         os.path.join('models/best_model', i)) for i in os.listdir(
+#                                         os.path.join(resources_path, 'models/best_model')) if i.startswith("model")])
 
-    model_path = os.path.join(resources_path, 'models/model_2019-09-12_14:24:25_+0200.h5')
-    model_weight_path = os.path.join(resources_path, 'models/model_weights_2019-09-12_14:24:25_+0200.h5')
+#     model_path = os.path.join(resources_path, 'models/model_2019-09-12_14:24:25_+0200.h5')
+#     model_weight_path = os.path.join(resources_path, 'models/model_weights_2019-09-12_14:24:25_+0200.h5')
+    model_path = os.path.join(resources_path, 'models/best_model/model_2019-09-12_12:13:22_+0000.h5')
+    model_weight_path = os.path.join(resources_path, 'models/best_model/model_weights_2019-09-12_12:13:22_+0000.h5')
 
     loaded_model = K.models.load_model(model_path)
     loaded_model.load_weights(model_weight_path)
