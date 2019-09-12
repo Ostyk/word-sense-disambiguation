@@ -135,7 +135,7 @@ def map_word_from_dict(lemma, pos, antivocab, output_vocab, instance):
     :return: replaced word
     """
     lemma, pos = OOV_handeler(lemma, pos)
-    
+
     mapped_word = None
     if lemma in antivocab:
         mapped_word = output_vocab["<REPLACEMENT>"]
@@ -152,17 +152,17 @@ def candidate_synsets(lemma, pos):
     """
     Used to restrict our attention only to synsets from the entire probability distribution over the output layer
     :param lemma:
-    :param pos: 
+    :param pos:
     :return: list(Candidate synsets) or lemma if nothing in Wordnet
     """
-    pos_dict = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB} 
-    
+    pos_dict = {"ADJ": wn.ADJ, "ADV": wn.ADV, "NOUN": wn.NOUN, "VERB": wn.VERB}
+
     synsets = wn.synsets(lemma, pos=pos_dict[pos]) if pos in pos_dict else wn.synsets(lemma)
-    if len(synsets) == 0: 
+    if len(synsets) == 0:
         return [lemma]
     else:
         return [WordNet.from_synset(x) for x in synsets]
-    
+
 def OOV_handeler(lemma, pos):
     """
     Handles OOV words

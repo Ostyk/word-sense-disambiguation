@@ -14,6 +14,9 @@ import generatorMultitask
 training_file_path = '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.data.xml'
 gold_file_path =  '../resources/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor.gold.key.txt'
 
+training_file_path = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2015/semeval2015.data.xml'
+gold_file_path = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2015/semeval2015.gold.key.txt'
+
 training_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2013/semeval2013.data.xml'
 gold_file_path_dev = '../resources/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2013/semeval2013.gold.key.txt'
 
@@ -26,7 +29,7 @@ input_antivocab_path = '../resources/semcor.leftout.vocab.json'
 embedding_size = 32
 batch_size = 64
 LEARNING_RATE = 0.1
-N_EPOCHS = 5
+N_EPOCHS = 2
 PADDING_SIZE = 30
 print_model = False
 
@@ -121,4 +124,4 @@ MultiTaskModelNetwork.fit_generator(train_generator,
                                 initial_epoch=0)
 
 
-models.save_model(model = BasicModelNetwork, model_name = model_name)
+models.save_model(model = MultiTaskModelNetwork, model_name = model_name)

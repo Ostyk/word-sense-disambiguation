@@ -58,7 +58,7 @@ def get(batch_size, resources_path, training_file_path, \
 
             #evaulation mode
             else:
-                output = prepare_sentence(sentence, antivocab, output_vocab)
+                output = prepare_sentence(sentence, antivocab, output_vocab, output_vocab2, output_vocab3)
 
                 batch['sentences'].append(output['sentence'])
                 batch['candidates'].append(output['candidates'])
@@ -102,6 +102,7 @@ def get(batch_size, resources_path, training_file_path, \
                 yield x, y
 
             else:
+
                 yield batch['sentences'], batch['candidates'], batch['candidates_wndomain'], batch['candidates_lex']
 
 def apply_padding(output, key, maxlen=50, value=1):
@@ -115,7 +116,7 @@ def apply_padding(output, key, maxlen=50, value=1):
     return padded list of lists
     """
     x = output[key]
-    if key == 'candidates':
+    if key in ['candidates', 'candidates_wndomain', 'candidates_lex']:
         for candidate in range(len(x)):
             x[candidate] =  x[candidate] + [[value]] * (maxlen-len(x[candidate]))
         return x
@@ -155,6 +156,8 @@ def prepare_sentence(sentence, antivocab, output_vocab, output_vocab2=None, outp
                 output['wndomain_labels'].append(output_word2)
                 output['lex_labels'].append(output_word3)
                 candidates = [output_word]
+                candidates2 = [output_word2]
+                candidates3 = [output_word3]
 
             else:
                 if labels is not None:
@@ -181,7 +184,7 @@ def prepare_sentence(sentence, antivocab, output_vocab, output_vocab2=None, outp
                 candidates3 = [utils.map_word_from_dict(c, "X", antivocab, output_vocab3, instance=True) for c in candidates]
 
             output['candidates'].append(candidates)
-            output['candidates_wndomain'].append(candidates)
-            output['candidates_lex'].append(candidates)
+            output['candidates_wndomain'].append(candidates2)
+            output['candidates_lex'].append(candidates3)
 
         return output
