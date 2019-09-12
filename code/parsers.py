@@ -13,14 +13,14 @@ class TrainingParser(object):
     def __init__(self, xml_file):
         self.xml_file = xml_file
         self.records = namedtuple("Training", "id_ lemma pos instance")
-    
+
     def count(self):
         """
         Parses only for the sake of counting the number of sentences
         return sum: of the sentences in the xml file
         """
         return sum(1 for _ in etree.iterparse(self.xml_file, tag="sentence"))
-            
+
     def parse(self):
         """
         Parses the archived training XML file in Raganato's format
@@ -52,6 +52,7 @@ class TrainingParser(object):
         input_vocab, pos_vocab = {}, {}
         words_total, count = 0, 0
         not_subsampled = set()
+        subsampling = True if min_count!=0 else False
 
         for sentence in tqdm(self.parse()):
             count += 1
@@ -59,18 +60,19 @@ class TrainingParser(object):
             for word in sentence:
                 words_total += 1
 
-                lemma = word.lemma
-                pos = word.pos
+                lemma, pos = word.lemma, word.pos
 
                 if word.instance == True:
                     not_subsampled.add(lemma)
                 # handling OOV
                 lemma, pos = utils.OOV_handeler(lemma, pos)
-                
+
                 input_vocab[lemma] =  input_vocab.get(lemma, 0) + 1
                 pos_vocab[pos] = pos_vocab.get(pos, 0) + 1
 
         print("{} sentences parsed with {} words".format(count, len(input_vocab)))
+        #print(not_subsampled)
+        #print(not_subsampled)
 
         #sort input vocab
         input_vocab = dict(sorted(input_vocab.items(), key=lambda x: x[1], reverse=True))
@@ -80,7 +82,7 @@ class TrainingParser(object):
 
         for (word, occurence) in input_vocab.items():
             if word in not_subsampled or occurence >= min_count:
-                prob = utils.probabilty_of_keeping_word(occurence, words_total, subsampling_rate, type_='mikolov2013')
+                prob = utils.probabilty_of_keeping_word(occurence, words_total, subsampling_rate, type_='mikolov2013') if subsampling else 0
                 if word in not_subsampled or random.uniform(0, 1) >= prob:
                     input_vocab_to_file.append(word)
                 else:
@@ -100,7 +102,7 @@ class TrainingParser(object):
         with open(pos_vocab_path, 'w') as f:
             json.dump(pos_vocab, f)
 
-            
+
 
 class GoldParser(object):
     """
@@ -109,17 +111,17 @@ class GoldParser(object):
     def __init__(self, file):
         self.file = open(file, 'r')
         self.records = namedtuple("Gold", "id_ senses")
-            
+
     def parse(self):
         """
         Parses the archived gold text file
         :return: sentence generator
         """
-        
+
         for line in self.file:
             line = line.strip()
-            line = line.split(" ")            
+            line = line.split(" ")
             item = self.records(id_ = line[0],
                                 senses = list(set(utils.WordNet.from_sensekey(i) for i in line[1:])))
-            
+
             yield item
