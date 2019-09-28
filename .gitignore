@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+resources/logging/
+resources/models/all_models/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -14,8 +18,9 @@ __pycache__/
 # IPython notebook checkpoints
 .ipynb_checkpoints
 
-
-
+# training data
+resources/training-data
+resources/WSD_Evaluation_Framework
 
 # OS generated files #
 ######################
@@ -68,6 +73,9 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+
+
+resources/logging/models
 
 # Translations
 *.mo
